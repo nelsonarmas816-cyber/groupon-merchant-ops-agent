@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merchant Ops Triage Agent · Groupon Madrid</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F7F8FA;color:#111827;font-size:14px;line-height:1.5;}
+.hdr{background:linear-gradient(135deg,#1B7F4A,#0F5C34);color:#fff;padding:0 24px;height:56px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.hdr-title{font-size:15px;font-weight:600;}
+.hdr-pill{background:rgba(255,255,255,.18);font-size:11px;padding:2px 9px;border-radius:20px;}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.6);margin-left:auto;}
+.hdr-count{background:rgba(255,255,255,.12);padding:4px 12px;border-radius:8px;font-size:12px;display:flex;align-items:center;gap:5px;}
+.hdr-count b{font-size:18px;}
+.tabs{background:#fff;border-bottom:1px solid #E5E7EB;display:flex;padding:0 24px;}
+.tab{padding:11px 18px;font-size:13px;font-weight:500;border:none;background:transparent;color:#6B7280;border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;}
+.tab:hover{color:#111827;}
+.tab.on{color:#1B7F4A;border-bottom-color:#1B7F4A;}
+.body{padding:22px;max-width:940px;margin:0 auto;}
+.card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.surface{background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px 14px;}
+.field-lbl{display:block;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+input,select,textarea{font-family:inherit;font-size:13px;background:#fff;color:#111827;border:1px solid #D1D5DB;border-radius:8px;padding:8px 11px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s;}
+input:focus,select:focus,textarea:focus{border-color:#1B7F4A;box-shadow:0 0 0 3px rgba(27,127,74,.1);}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:500;border-radius:8px;cursor:pointer;transition:all .15s;border:none;}
+.btn-g{background:#1B7F4A;color:#fff;}
+.btn-g:hover{background:#145C36;transform:translateY(-1px);box-shadow:0 4px 14px rgba(27,127,74,.3);}
+.btn-g:active{transform:none;}
+.btn-g:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.pc{background:#fff;border:1.5px solid #E5E7EB;border-radius:10px;padding:11px 14px;cursor:pointer;transition:all .15s;}
+.pc:hover{border-color:#86EFAC;box-shadow:0 1px 6px rgba(0,0,0,.07);}
+.pc.on{border-color:#1B7F4A;background:#F0FDF4;}
+.pc-lbl{font-size:13px;font-weight:500;}
+.pc-sub{font-size:11px;color:#6B7280;margin-top:2px;}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+.bc{background:#FEE2E2;color:#991B1B;} .bh{background:#FEF3C7;color:#92400E;} .bm{background:#DBEAFE;color:#1E40AF;} .bl{background:#D1FAE5;color:#065F46;}
+.bplat{background:#EDE9FE;color:#5B21B6;} .bgold{background:#FEF3C7;color:#92400E;} .bsilv{background:#F3F4F6;color:#374151;} .bbronz{background:#FEF3C7;color:#78350F;}
+.bauto{background:#D1FAE5;color:#065F46;} .bbpo{background:#DBEAFE;color:#1E40AF;} .bih{background:#FEF3C7;color:#92400E;} .bmgr{background:#FED7AA;color:#9A3412;} .burg{background:#FEE2E2;color:#991B1B;}
+.tag{display:inline-flex;font-size:10px;padding:1px 7px;border-radius:20px;background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;}
+.divider{height:1px;background:#F3F4F6;margin:13px 0;}
+.step{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.s-icon{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.s-title{font-size:13px;font-weight:500;}
+.s-sub{font-size:12px;color:#6B7280;margin-top:2px;}
+.toggle-btn{background:none;border:none;font-size:11px;color:#6B7280;cursor:pointer;padding:0;margin-top:3px;font-family:inherit;}
+pre.dv{display:none;font-family:'Courier New',monospace;font-size:11px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:6px;padding:8px;overflow:auto;max-height:150px;margin-top:6px;white-space:pre-wrap;word-break:break-all;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .9s linear infinite;display:inline-block;}
+.score-ring{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;flex-shrink:0;}
+.prog-bar{height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden;margin:7px 0;}
+.prog-fill{height:100%;background:#1B7F4A;transition:width .4s ease;border-radius:3px;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;}
+.stat-c{border-radius:10px;padding:12px 14px;text-align:center;}
+.stat-n{font-size:26px;font-weight:600;line-height:1;}
+.stat-l{font-size:11px;margin-top:3px;font-weight:500;}
+.filter-btn{padding:4px 12px;border-radius:20px;border:1px solid #E5E7EB;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:#6B7280;font-family:inherit;transition:all .15s;}
+.filter-btn:hover{border-color:#1B7F4A;color:#1B7F4A;}
+.filter-btn.on{background:#1B7F4A;color:#fff;border-color:#1B7F4A;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #E5E7EB;white-space:nowrap;}
+td{padding:9px 10px;border-bottom:1px solid #F3F4F6;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#F9FAFB;}
+.sm-ring{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin:auto;}
+.drafted-box{background:#F0FDF4;border:1px solid #86EFAC;border-radius:9px;padding:12px 14px;margin-top:10px;}
+.drafted-lbl{font-size:11px;font-weight:600;color:#166534;margin-bottom:5px;}
+.drafted-text{font-size:13px;line-height:1.65;white-space:pre-wrap;}
+.err-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;font-size:13px;color:#991B1B;}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <span style="font-size:20px;">⚡</span>
+  <span class="hdr-title">Merchant Ops Triage Agent</span>
+  <span class="hdr-pill">v1.0 · Groupon Madrid</span>
+  <span class="hdr-sub">AI-first routing · Claude tool use + multi-step reasoning</span>
+  <div class="hdr-count"><b>24</b> requests in queue</div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('single')">🔍 Single Request Triage</button>
+  <button class="tab" onclick="switchTab('batch')">📦 Batch Queue Processing</button>
+</div>
+
+<div class="body">
+
+  <!-- SINGLE PANE -->
+  <div id="pane-single">
+    <div class="presets" id="presets-grid"></div>
+    <div id="custom-form" class="card" style="margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div><label class="field-lbl">Merchant ID</label><input id="c-mid" value="M-10372" placeholder="e.g. M-10372"/></div>
+        <div><label class="field-lbl">Request Type</label>
+          <select id="c-type">
+            <option value="billing_dispute">Billing Dispute</option>
+            <option value="performance_complaint">Performance Complaint</option>
+            <option value="deal_setup">Deal Setup</option>
+            <option value="content_change">Content Change</option>
+            <option value="account_update">Account Update</option>
+            <option value="escalation">Escalation</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-lbl">Request Description</label>
+      <textarea id="c-desc" rows="3" placeholder="Describe the merchant's issue…" style="resize:vertical;"></textarea>
+    </div>
+    <div id="preset-desc" class="surface hidden" style="margin-bottom:14px;"></div>
+    <button class="btn btn-g" id="btn-single" onclick="runSingle()">▶ Triage Request</button>
+    <div id="result-single" class="card hidden" style="margin-top:16px;"></div>
+  </div>
+
+  <!-- BATCH PANE -->
+  <div id="pane-batch" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+      <div>
+        <div style="font-size:15px;font-weight:600;">Pending Queue — 24 requests</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px;">All tiers · open &amp; escalated · awaiting triage</div>
+      </div>
+      <button class="btn btn-g" id="btn-batch" onclick="runBatch()">⚡ Process Batch Queue</button>
+    </div>
+    <div id="batch-prog" class="card hidden" style="margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Analyzing 24 requests…</div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div id="prog-sub" style="font-size:12px;color:#6B7280;margin-top:4px;">Initializing…</div>
+    </div>
+    <div id="batch-stats" class="stats-grid hidden"></div>
+    <div id="filter-row" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center;"></div>
+    <div id="batch-results" class="card hidden"></div>
+    <div id="batch-preview" class="card">
+      <div style="font-size:13px;font-weight:500;color:#6B7280;margin-bottom:12px;">Queue preview — click ⚡ Process to analyze all 24 requests with AI</div>
+      <div style="overflow-x:auto;"><table><thead><tr><th>Request ID</th><th>Merchant</th><th>Tier</th><th>Type</th><th>GMV / mo</th><th>Status</th></tr></thead><tbody id="preview-body"></tbody></table></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────────
+const PROFILES={
+"M-10372":{merchant_name:"Das Tavern House",category:"food_drink",active_deals:8,monthly_gmv_usd:146213.67,lifetime_months:42,merchant_tier:"platinum",churn_risk_score:0.06,nps_last_survey:8,market:"FR"},
+"M-10437":{merchant_name:"Das Wave Club UK",category:"activities",active_deals:5,monthly_gmv_usd:68283.32,lifetime_months:28,merchant_tier:"platinum",churn_risk_score:0.188,nps_last_survey:4,market:"UK"},
+"M-10451":{merchant_name:"La Cafe Hub",category:"food_drink",active_deals:3,monthly_gmv_usd:15124.30,lifetime_months:14,merchant_tier:"silver",churn_risk_score:0.084,nps_last_survey:null,market:"FR"},
+"M-10500":{merchant_name:"Le Store Online",category:"goods",active_deals:2,monthly_gmv_usd:1864.96,lifetime_months:7,merchant_tier:"bronze",churn_risk_score:0.409,nps_last_survey:null,market:"FR"},
+"M-10948":{merchant_name:"The Fresh Studio",category:"health_beauty",active_deals:4,monthly_gmv_usd:26538.12,lifetime_months:19,merchant_tier:"gold",churn_risk_score:0.0,nps_last_survey:7,market:"AU"},
+"M-10024":{merchant_name:"The Bistro Bar DE",category:"food_drink",active_deals:5,monthly_gmv_usd:39829.23,lifetime_months:20,merchant_tier:"gold",churn_risk_score:0.224,nps_last_survey:5,market:"DE"},
+"M-10022":{merchant_name:"Le Market Co",category:"goods",active_deals:3,monthly_gmv_usd:7727.87,lifetime_months:25,merchant_tier:"silver",churn_risk_score:0.2,nps_last_survey:null,market:"US"},
+"M-10007":{merchant_name:"El Radiance Center",category:"health_beauty",active_deals:1,monthly_gmv_usd:3983.38,lifetime_months:6,merchant_tier:"bronze",churn_risk_score:0.487,nps_last_survey:7,market:"UK"},
+"M-10010":{merchant_name:"Das Fork Room DE",category:"food_drink",active_deals:7,monthly_gmv_usd:71030.30,lifetime_months:51,merchant_tier:"platinum",churn_risk_score:0.231,nps_last_survey:6,market:"DE"}
+};
+
+const HISTORY={
+"M-10372":[{date:"2026-03-01",type:"account_update",resolution:"completed",touches:1,sla_met:true},{date:"2026-02-20",type:"billing_dispute",resolution:"escalated",touches:5,sla_met:false},{date:"2026-01-15",type:"deal_setup",resolution:"completed",touches:2,sla_met:true}],
+"M-10437":[{date:"2026-03-05",type:"performance_complaint",resolution:"escalated",touches:7,sla_met:false},{date:"2026-02-28",type:"performance_complaint",resolution:"escalated",touches:6,sla_met:false},{date:"2026-02-10",type:"billing_dispute",resolution:"completed",touches:3,sla_met:true}],
+"M-10451":[{date:"2026-03-03",type:"billing_dispute",resolution:"escalated",touches:6,sla_met:false},{date:"2026-02-25",type:"billing_dispute",resolution:"completed",touches:4,sla_met:false},{date:"2026-02-18",type:"account_update",resolution:"completed",touches:2,sla_met:true}],
+"M-10500":[{date:"2026-03-04",type:"content_change",resolution:"completed",touches:1,sla_met:true},{date:"2026-02-22",type:"account_update",resolution:"completed",touches:1,sla_met:true}],
+"M-10948":[{date:"2026-03-02",type:"deal_setup",resolution:"completed",touches:2,sla_met:true},{date:"2026-02-15",type:"content_change",resolution:"completed",touches:1,sla_met:true}],
+"M-10024":[{date:"2026-03-09",type:"billing_dispute",resolution:"escalated",touches:6,sla_met:false},{date:"2026-03-02",type:"escalation",resolution:"completed",touches:7,sla_met:true},{date:"2026-02-25",type:"escalation",resolution:"escalated",touches:2,sla_met:null}],
+"M-10022":[{date:"2026-02-24",type:"account_update",resolution:"completed",touches:3,sla_met:true},{date:"2026-02-17",type:"billing_dispute",resolution:"escalated",touches:4,sla_met:false}],
+"M-10007":[{date:"2026-03-06",type:"deal_setup",resolution:"completed",touches:4,sla_met:false},{date:"2026-03-03",type:"billing_dispute",resolution:"completed",touches:4,sla_met:true}]
+};
+
+const QUEUE=[
+{request_id:"REQ-202177",merchant_id:"M-10372",merchant_name:"Das Tavern House",merchant_tier:"platinum",request_type:"billing_dispute",request_description:"Invoice discrepancy: 5 redemptions billed but merchant records show fewer.",monthly_gmv_usd:146213.67,churn_risk_score:0.06,resolution:"pending",touches:3,sla_hours:8},
+{request_id:"REQ-200716",merchant_id:"M-10437",merchant_name:"Das Wave Club UK",merchant_tier:"platinum",request_type:"performance_complaint",request_description:"Merchant unhappy with deal performance. Only 5 redemptions in 30 days vs. expected 100.",monthly_gmv_usd:68283.32,churn_risk_score:0.188,resolution:"escalated",touches:7,sla_hours:4},
+{request_id:"REQ-204086",merchant_id:"M-11037",merchant_name:"Das Cantina Room AU",merchant_tier:"platinum",request_type:"deal_setup",request_description:"Requesting deal setup for seasonal promotion. Go-kart racing, targeting 10 redemptions.",monthly_gmv_usd:3638.38,churn_risk_score:0.203,resolution:"escalated",touches:2,sla_hours:4},
+{request_id:"REQ-202897",merchant_id:"M-10650",merchant_name:"The Rush Academy",merchant_tier:"platinum",request_type:"content_change",request_description:"Fix typo in deal title. 'escape room' is misspelled.",monthly_gmv_usd:124102.95,churn_risk_score:0.0,resolution:"escalated",touches:8,sla_hours:2},
+{request_id:"REQ-201446",merchant_id:"M-10907",merchant_name:"Jump Co",merchant_tier:"platinum",request_type:"account_update",request_description:"Deactivation request: merchant going on seasonal break for 15 months.",monthly_gmv_usd:223186.48,churn_risk_score:0.0,resolution:"pending",touches:2,sla_hours:2},
+{request_id:"REQ-207151",merchant_id:"M-10634",merchant_name:"Heights Co",merchant_tier:"platinum",request_type:"escalation",request_description:"Escalation from CS: customer complaints about merchant quality. 20 complaints in 7 days.",monthly_gmv_usd:144536.36,churn_risk_score:0.0,resolution:"escalated",touches:6,sla_hours:2},
+{request_id:"REQ-201064",merchant_id:"M-10024",merchant_name:"The Bistro Bar DE",merchant_tier:"gold",request_type:"billing_dispute",request_description:"Merchant claims they were charged commission on 200 cancelled orders.",monthly_gmv_usd:39829.23,churn_risk_score:0.224,resolution:"escalated",touches:6,sla_hours:16},
+{request_id:"REQ-202996",merchant_id:"M-10948",merchant_name:"The Fresh Studio",merchant_tier:"gold",request_type:"performance_complaint",request_description:"Request for performance report and optimization for deal #593842.",monthly_gmv_usd:26538.12,churn_risk_score:0.0,resolution:"escalated",touches:3,sla_hours:8},
+{request_id:"REQ-204510",merchant_id:"M-10295",merchant_name:"El Studio Group",merchant_tier:"gold",request_type:"escalation",request_description:"ESCALATION: Merchant Elena Petrov threatening legal action over billing dispute.",monthly_gmv_usd:20292.90,churn_risk_score:0.035,resolution:"pending",touches:3,sla_hours:4},
+{request_id:"REQ-207303",merchant_id:"M-10688",merchant_name:"Das Sunrise House",merchant_tier:"gold",request_type:"account_update",request_description:"Add new category 'travel' to merchant profile. Expanding services.",monthly_gmv_usd:50990.55,churn_risk_score:0.404,resolution:"escalated",touches:6,sla_hours:4},
+{request_id:"REQ-201685",merchant_id:"M-10451",merchant_name:"La Cafe Hub",merchant_tier:"silver",request_type:"escalation",request_description:"ESCALATION: Merchant Marco Rossi threatening legal action over billing dispute.",monthly_gmv_usd:15124.30,churn_risk_score:0.084,resolution:"escalated",touches:6,sla_hours:8},
+{request_id:"REQ-202229",merchant_id:"M-10609",merchant_name:"The Collection Express",merchant_tier:"silver",request_type:"billing_dispute",request_description:"Invoice discrepancy: 100 redemptions billed but merchant records show fewer.",monthly_gmv_usd:14377.98,churn_risk_score:0.225,resolution:"pending",touches:2,sla_hours:48},
+{request_id:"REQ-205222",merchant_id:"M-11093",merchant_name:"The Valley House US",merchant_tier:"silver",request_type:"performance_complaint",request_description:"MERCHANT UNHAPPY WITH DEAL PERFORMANCE. ONLY 20 REDEMPTIONS IN 30 DAYS VS EXPECTED 500.",monthly_gmv_usd:6550.21,churn_risk_score:0.213,resolution:"escalated",touches:9,sla_hours:24},
+{request_id:"REQ-202697",merchant_id:"M-10022",merchant_name:"Le Market Co",merchant_tier:"silver",request_type:"account_update",request_description:"Merchant requesting to add a second location to their account.",monthly_gmv_usd:7727.87,churn_risk_score:0.2,resolution:"escalated",touches:4,sla_hours:8},
+{request_id:"REQ-207152",merchant_id:"M-10992",merchant_name:"El Solutions Agency FR",merchant_tier:"silver",request_type:"content_change",request_description:"Need to update deal description. Current text has wrong hours of operation.",monthly_gmv_usd:8661.64,churn_risk_score:0.229,resolution:"escalated",touches:4,sla_hours:12},
+{request_id:"REQ-200487",merchant_id:"M-10633",merchant_name:"The Cafe Place",merchant_tier:"silver",request_type:"deal_setup",request_description:"Requesting deal setup for seasonal promotion. Beauty treatment, targeting 20 redemptions.",monthly_gmv_usd:12009.22,churn_risk_score:0.249,resolution:"escalated",touches:8,sla_hours:24},
+{request_id:"REQ-203875",merchant_id:"M-10007",merchant_name:"El Radiance Center",merchant_tier:"bronze",request_type:"billing_dispute",request_description:"Merchant hasn't received payment for last month. $2500 outstanding.",monthly_gmv_usd:3983.38,churn_risk_score:0.487,resolution:"escalated",touches:6,sla_hours:72},
+{request_id:"REQ-203894",merchant_id:"M-10425",merchant_name:"Le Expert Network",merchant_tier:"bronze",request_type:"performance_complaint",request_description:"Request for performance report and optimization recommendations for deal #526386.",monthly_gmv_usd:3423.21,churn_risk_score:0.559,resolution:"pending",touches:1,sla_hours:48},
+{request_id:"REQ-207197",merchant_id:"M-10435",merchant_name:"Le Aura Wellness",merchant_tier:"bronze",request_type:"deal_setup",request_description:"New deal setup for health_beauty. Merchant wants 70% off deal for yoga package.",monthly_gmv_usd:707.48,churn_risk_score:0.717,resolution:"escalated",touches:7,sla_hours:48},
+{request_id:"REQ-203851",merchant_id:"M-10500",merchant_name:"Le Store Online",merchant_tier:"bronze",request_type:"content_change",request_description:"Please change the featured image on deal #290037. New image attached.",monthly_gmv_usd:1864.96,churn_risk_score:0.409,resolution:"pending",touches:1,sla_hours:24},
+{request_id:"REQ-206829",merchant_id:"M-10267",merchant_name:"Le Noodle Bar",merchant_tier:"bronze",request_type:"account_update",request_description:"Update business license information. New license number provided.",monthly_gmv_usd:3818.52,churn_risk_score:0.658,resolution:"escalated",touches:3,sla_hours:24},
+{request_id:"REQ-206006",merchant_id:"M-10596",merchant_name:"The Cafe Joint",merchant_tier:"bronze",request_type:"escalation",request_description:"High-priority: Top merchant in IT market hasn't responded to renewal offer in 30 days.",monthly_gmv_usd:3853.98,churn_risk_score:0.632,resolution:"pending",touches:0,sla_hours:16},
+{request_id:"REQ-207870",merchant_id:"M-11182",merchant_name:"La Island Suites US",merchant_tier:"gold",request_type:"deal_setup",request_description:"Merchant requesting new campaign setup. Category: travel. They want to feature wine tasting.",monthly_gmv_usd:30098.51,churn_risk_score:0.156,resolution:"escalated",touches:6,sla_hours:8},
+{request_id:"REQ-207520",merchant_id:"M-10931",merchant_name:"Das Zen Center ES",merchant_tier:"gold",request_type:"content_change",request_description:"Add Spanish translation to deal page. Market: ES.",monthly_gmv_usd:2923.81,churn_risk_score:0.358,resolution:"escalated",touches:8,sla_hours:4}
+];
+
+const PRESETS=[
+{id:"p1",label:"Platinum · Billing Dispute",sub:"$146K GMV · invoice discrepancy",mid:"M-10372",type:"billing_dispute",desc:"Invoice discrepancy: 5 redemptions billed but merchant records show fewer. Requesting immediate correction and refund, will pause deal if not resolved today."},
+{id:"p2",label:"Silver · Legal Escalation",sub:"Legal threat · billing dispute",mid:"M-10451",type:"escalation",desc:"ESCALATION: Merchant Marco Rossi threatening legal action over unresolved billing dispute. Demands immediate resolution, full refund, and written apology. Third time contacting us."},
+{id:"p3",label:"Gold · Performance Complaint",sub:"Low redemptions · optimization request",mid:"M-10948",type:"performance_complaint",desc:"Request for performance report and optimization recommendations for deal #593842. Only 8 redemptions in 30 days vs. expected 50. Considering pausing the campaign."},
+{id:"p4",label:"Bronze · Content Change",sub:"Simple image update · auto-resolvable",mid:"M-10500",type:"content_change",desc:"Please change the featured image on deal #290037. New image attached and approved by brand team. No other changes needed."}
+];
+
+// ─── AGENT CORE ────────────────────────────────────────────────────────────────
+const SYSTEM=`You are an intelligent Merchant Operations Triage Agent for Groupon Global Operations (Madrid hub).
+
+MANDATORY STEPS — execute in this exact order:
+1. Call lookup_merchant_profile to get tier, GMV, churn risk, NPS, lifetime months
+2. Call get_request_history to understand recent patterns and repeat issues
+3. If merchant is platinum OR churn_risk > 0.6 OR monthly_gmv_usd > 50000 OR description contains legal threat or 20+ complaints, ALSO call flag_account_manager
+
+ROUTING GUIDE:
+- auto_resolve: ANY content_change or account_update where: touches <= 2, no prior escalations, description is straightforward (image swap, text fix, hours update, location add). ALWAYS auto-resolve these — do not escalate simple edits.
+- bpo_standard: Routine non-urgent requests, bronze/silver tier, no risk flags
+- in_house_specialist: Complex issues, gold tier, technical work required, moderate billing disputes
+- manager_escalation: Platinum merchants, churn_risk > 0.5, repeated escalations
+- urgent_escalation: Legal threats, 20+ complaints, platinum + churn > 0.6, critical GMV risk
+
+After all tool calls, respond ONLY with valid JSON (no markdown fences, no extra text):
+{"priority_score":<0-100>,"priority_label":"CRITICAL|HIGH|MEDIUM|LOW","routing":"auto_resolve|bpo_standard|in_house_specialist|manager_escalation|urgent_escalation","confidence":<0.0-1.0>,"reasoning":"<2-3 sentences>","sla_recommendation":"<e.g. 2h>","estimated_cost_usd":<number>,"flags":["f1","f2"],"recommended_actions":["a1","a2","a3"],"drafted_response":"<ONLY if routing is auto_resolve — full response to merchant>"}`;
+
+const TOOLS=[
+{name:"lookup_merchant_profile",description:"Get merchant profile: tier, GMV, churn risk, NPS, category, active deals, lifetime. Call this FIRST.",input_schema:{type:"object",properties:{merchant_id:{type:"string"}},required:["merchant_id"]}},
+{name:"get_request_history",description:"Get recent request history: escalations, SLA breaches, repeat patterns.",input_schema:{type:"object",properties:{merchant_id:{type:"string"},limit:{type:"integer",default:5}},required:["merchant_id"]}},
+{name:"flag_account_manager",description:"Flag high-value or at-risk merchant for account manager. Use for platinum, churn>0.6, GMV>$50K, or legal threats.",input_schema:{type:"object",properties:{merchant_id:{type:"string"},merchant_name:{type:"string"},reason:{type:"string"},urgency:{type:"string",enum:["immediate","same_day","next_business_day"]}},required:["merchant_id","merchant_name","reason","urgency"]}}
+];
+
+function execTool(name,input){
+  if(name==="lookup_merchant_profile"){
+    const p=PROFILES[input.merchant_id];
+    if(!p)return{error:"Not found",merchant_id:input.merchant_id,note:"New merchant — treat conservatively"};
+    return{merchant_id:input.merchant_id,...p};
+  }
+  if(name==="get_request_history"){
+    const h=HISTORY[input.merchant_id]||[];
+    const r=h.slice(0,input.limit||5);
+    return{merchant_id:input.merchant_id,total:r.length,escalations:r.filter(x=>x.resolution==="escalated").length,sla_breaches:r.filter(x=>x.sla_met===false).length,requests:r};
+  }
+  if(name==="flag_account_manager"){
+    return{flagged:true,merchant_id:input.merchant_id,merchant_name:input.merchant_name,reason:input.reason,urgency:input.urgency,notification_id:"FLAG-"+Math.random().toString(36).substr(2,6).toUpperCase(),sent_to:"ops-accounts@groupon.com",timestamp:new Date().toISOString()};
+  }
+  return{error:"Unknown tool: "+name};
+}
+
+async function agentLoop(mid,type,desc,onStep){
+  const msgs=[{role:"user",content:`Triage this merchant request:\n\nMerchant ID: ${mid}\nRequest Type: ${type}\nDescription: ${desc}\n\nUse your tools to gather context, then return your JSON triage decision.`}];
+  for(let i=0;i<8;i++){
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1500,system:SYSTEM,tools:TOOLS,messages:msgs})});
+    if(!r.ok){const t=await r.text();throw new Error("API "+r.status+": "+t.substring(0,200));}
+    const d=await r.json();
+    msgs.push({role:"assistant",content:d.content});
+    if(d.stop_reason==="end_turn"){
+      const txt=(d.content.find(b=>b.type==="text")||{}).text||"";
+      const jsonMatch=txt.match(/\{[\s\S]*\}/);
+      if(!jsonMatch)throw new Error("No JSON found in agent response: "+txt.substring(0,120));
+      return JSON.parse(jsonMatch[0]);
+    }
+    if(d.stop_reason==="tool_use"){
+      const res=[];
+      for(const b of d.content){
+        if(b.type!=="tool_use")continue;
+        onStep({phase:"call",tool:b.name,input:b.input});
+        const result=execTool(b.name,b.input);
+        onStep({phase:"result",tool:b.name,result});
+        res.push({type:"tool_result",tool_use_id:b.id,content:JSON.stringify(result)});
+      }
+      msgs.push({role:"user",content:res});
+    }
+  }
+  throw new Error("Agent did not converge after max iterations");
+}
+
+async function batchAnalysis(onProg){
+  onProg(20);
+  const ctx=QUEUE.map(r=>({request_id:r.request_id,merchant_id:r.merchant_id,merchant_name:r.merchant_name,merchant_tier:r.merchant_tier,request_type:r.request_type,description:r.request_description,monthly_gmv_usd:r.monthly_gmv_usd,churn_risk_score:r.churn_risk_score,resolution:r.resolution,touches:r.touches,sla_hours:r.sla_hours}));
+  onProg(40);
+  const prompt=`You are a Merchant Ops Triage Agent for Groupon. Prioritize these ${QUEUE.length} pending/escalated requests.\n\nPRIORITY RULES:\n- Platinum + any issue = minimum HIGH\n- Legal threats (keywords: legal, lawsuit, lawyer) = CRITICAL\n- churn_risk > 0.6 = escalate one level\n- GMV > $100K/mo = escalate one level\n- Simple content changes with touches <= 2 = LOW, route to auto_resolve\n- Repeat escalations (touches > 5) = HIGH minimum\n\nROUTING: auto_resolve | bpo_standard | in_house_specialist | manager_escalation | urgent_escalation\n\nDATA:\n${JSON.stringify(ctx)}\n\nRespond ONLY with valid JSON array (absolutely no markdown):\n[{"request_id":"...","merchant_id":"...","merchant_name":"...","merchant_tier":"...","request_type":"...","priority_score":0-100,"priority_label":"CRITICAL|HIGH|MEDIUM|LOW","routing":"...","flags":["..."],"reasoning":"1-2 sentences","recommended_action":"single most important next step"}]`;
+  onProg(60);
+  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4000,messages:[{role:"user",content:prompt}]})});
+  if(!r.ok){const t=await r.text();throw new Error("API "+r.status+": "+t.substring(0,200));}
+  onProg(85);
+  const d=await r.json();
+  const txt=(d.content.find(b=>b.type==="text")||{}).text||"";
+  onProg(100);
+  const jsonMatch=txt.match(/\[[\s\S]*\]/);
+  if(!jsonMatch)throw new Error("No JSON array found in batch response: "+txt.substring(0,120));
+  return JSON.parse(jsonMatch[0]);
+}
+
+// ─── UI HELPERS ────────────────────────────────────────────────────────────────
+const TOOL_META={
+  lookup_merchant_profile:{label:"Merchant Profile",bg:"#DBEAFE",tc:"#1E40AF"},
+  get_request_history:{label:"Request History",bg:"#FEF3C7",tc:"#92400E"},
+  flag_account_manager:{label:"Account Manager Alert",bg:"#FEE2E2",tc:"#991B1B"}
+};
+const PRI={CRITICAL:{bg:"#FEE2E2",tc:"#991B1B",ring:"#FCA5A5"},HIGH:{bg:"#FEF3C7",tc:"#92400E",ring:"#FCD34D"},MEDIUM:{bg:"#DBEAFE",tc:"#1E40AF",ring:"#93C5FD"},LOW:{bg:"#D1FAE5",tc:"#065F46",ring:"#6EE7B7"}};
+const ROUT={auto_resolve:{label:"Auto-Resolve",cls:"bauto"},bpo_standard:{label:"BPO Standard",cls:"bbpo"},in_house_specialist:{label:"In-House Specialist",cls:"bih"},manager_escalation:{label:"Manager Escalation",cls:"bmgr"},urgent_escalation:{label:"Urgent Escalation",cls:"burg"}};
+const TIER={platinum:"bplat",gold:"bgold",silver:"bsilv",bronze:"bbronz"};
+
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function tierBadge(t){return`<span class="badge ${TIER[t]||'bbronz'}">${t}</span>`;}
+function priBadge(p){return`<span class="badge ${({CRITICAL:'bc',HIGH:'bh',MEDIUM:'bm',LOW:'bl'})[p]||'bm'}">${p}</span>`;}
+function routBadge(r){const m=ROUT[r]||{label:r,cls:"bbpo"};return`<span class="badge ${m.cls}">${m.label}</span>`;}
+
+// ─── SINGLE MODE ──────────────────────────────────────────────────────────────
+let activePreset=null;
+
+function initPresets(){
+  document.getElementById("presets-grid").innerHTML=PRESETS.map(p=>`<div class="pc" id="pc-${p.id}" onclick="selPreset('${p.id}')"><div class="pc-lbl">${p.label}</div><div class="pc-sub">${p.sub}</div></div>`).join("");
+}
+
+function selPreset(id){
+  if(activePreset===id){
+    activePreset=null;
+    document.getElementById("pc-"+id).classList.remove("on");
+    document.getElementById("custom-form").classList.remove("hidden");
+    document.getElementById("preset-desc").classList.add("hidden");
+    return;
+  }
+  PRESETS.forEach(p=>document.getElementById("pc-"+p.id).classList.remove("on"));
+  activePreset=id;
+  document.getElementById("pc-"+id).classList.add("on");
+  document.getElementById("custom-form").classList.add("hidden");
+  const p=PRESETS.find(x=>x.id===id);
+  const pd=document.getElementById("preset-desc");
+  pd.innerHTML=`<div class="field-lbl">Request Description</div><div style="font-size:13px;line-height:1.6;margin-top:4px;">${esc(p.desc)}</div>`;
+  pd.classList.remove("hidden");
+  clearSingleResult();
+}
+
+function clearSingleResult(){
+  const r=document.getElementById("result-single");
+  r.innerHTML="";r.classList.add("hidden");
+}
+
+function addStep(step){
+  const c=document.getElementById("steps-box");
+  if(!c)return;
+  const m=TOOL_META[step.tool]||{label:step.tool,bg:"#F3F4F6",tc:"#374151"};
+  if(step.phase==="call"){
+    const d=document.createElement("div");
+    d.className="step";d.id="st-"+step.tool;
+    d.innerHTML=`<div class="s-icon" style="background:${m.bg};color:${m.tc}"><span class="spin">⏳</span></div><div><div class="s-title" style="color:${m.tc};">Calling ${m.label}</div><div class="s-sub">merchant_id: ${esc(step.input.merchant_id||"")}${step.input.reason?" · "+step.input.reason.substring(0,40)+"…":""}</div></div>`;
+    c.appendChild(d);
+  } else {
+    const d=document.getElementById("st-"+step.tool);
+    if(d){
+      d.innerHTML=`<div class="s-icon" style="background:${m.bg};color:${m.tc};">✓</div><div style="flex:1"><div class="s-title">${m.label} retrieved</div><button class="toggle-btn" onclick="toggleDv(this)">▼ view data</button><pre class="dv">${esc(JSON.stringify(step.result,null,2))}</pre></div><span style="font-size:12px;color:#059669;font-weight:500;">done</span>`;
+    }
+  }
+}
+
+function toggleDv(btn){
+  const pre=btn.nextElementSibling;
+  const open=pre.style.display==="block";
+  pre.style.display=open?"none":"block";
+  btn.textContent=(open?"▼ view":"▲ hide")+" data";
+}
+
+function clarityBadge(confidence){
+  const c=confidence||0;
+  const pct=Math.round(c*100);
+  let bg,tc;
+  if(c>=0.8){bg="#D1FAE5";tc="#065F46";}
+  else if(c>=0.6){bg="#FEF3C7";tc="#92400E";}
+  else{bg="#FEE2E2";tc="#991B1B";}
+  return`<span class="badge" style="background:${bg};color:${tc};font-size:12px;padding:2px 9px;">${pct}%</span>`;
+}
+
+function renderDecision(d,container){
+  const pm=PRI[d.priority_label]||PRI.MEDIUM;
+  const score=Math.round(d.priority_score||0);
+  const actions=(d.recommended_actions||[]).map((a,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;"><div style="width:19px;height:19px;border-radius:50%;background:#1B7F4A;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${i+1}</div><span style="font-size:13px;line-height:1.5;">${esc(a)}</span></div>`).join("");
+  const flags=(d.flags||[]).map(f=>`<span class="tag">${f.replace(/_/g," ")}</span>`).join(" ");
+  const drafted=d.drafted_response?`<div class="drafted-box"><div class="drafted-lbl">✓ AUTO-RESOLVED — DRAFTED RESPONSE</div><div class="drafted-text">${esc(d.drafted_response)}</div></div>`:"";
+  container.innerHTML+=`<div class="divider"></div><div style="font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Triage Decision</div>
+<div style="display:flex;align-items:center;gap:13px;margin-bottom:14px;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;">
+    <div class="score-ring" style="background:${pm.ring};color:${pm.tc};">${score}</div>
+    <span style="font-size:10px;font-weight:600;color:${pm.tc};text-transform:uppercase;letter-spacing:.04em;">urgency</span>
+  </div>
+  <div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px;">${priBadge(d.priority_label)} ${routBadge(d.routing)}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:#6B7280;">Decision clarity:</span>${clarityBadge(d.confidence)}
+      <span style="font-size:12px;color:#6B7280;margin-left:4px;">Resolve within:</span><span style="font-size:12px;font-weight:600;color:#1B7F4A;">${esc(d.sla_recommendation||"—")}</span>
+    </div>
+  </div>
+</div>
+<div style="font-size:13px;line-height:1.65;margin-bottom:12px;"><strong style="font-weight:500;">Reasoning: </strong>${esc(d.reasoning)}</div>
+${flags?`<div style="margin-bottom:12px;"><div class="field-lbl">Flags</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;">${flags}</div></div>`:""}
+${actions?`<div style="margin-bottom:12px;"><div class="field-lbl">Recommended Actions</div><div style="margin-top:6px;">${actions}</div></div>`:""}
+${drafted}`;
+}
+
+async function runSingle(){
+  let mid,type,desc;
+  if(activePreset){const p=PRESETS.find(x=>x.id===activePreset);mid=p.mid;type=p.type;desc=p.desc;}
+  else{mid=document.getElementById("c-mid").value.trim();type=document.getElementById("c-type").value;desc=document.getElementById("c-desc").value.trim();}
+  if(!mid||!desc)return;
+  const btn=document.getElementById("btn-single");
+  btn.disabled=true;btn.innerHTML='<span class="spin" style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;"></span> Running agent…';
+  const box=document.getElementById("result-single");
+  box.classList.remove("hidden");
+  box.innerHTML='<div style="font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Agent Reasoning Steps</div><div id="steps-box"></div><div id="running-lbl" style="font-size:12px;color:#6B7280;margin-top:4px;">Generating decision…</div>';
+  try{
+    const dec=await agentLoop(mid,type,desc,addStep);
+    const lbl=document.getElementById("running-lbl");
+    if(lbl)lbl.remove();
+    renderDecision(dec,box);
+  }catch(e){
+    box.innerHTML+=`<div class="err-box" style="margin-top:10px;">Error: ${esc(e.message)}</div>`;
+  }finally{
+    btn.disabled=false;btn.innerHTML="▶ Triage Request";
+  }
+}
+
+// ─── BATCH MODE ───────────────────────────────────────────────────────────────
+function setProg(p){
+  document.getElementById("prog-fill").style.width=p+"%";
+  document.getElementById("prog-sub").textContent=p<40?"Loading merchant context…":p<70?"Running analytical pipeline…":"Generating prioritized work queue…";
+}
+
+function renderBatchStats(results){
+  const c=results.filter(r=>r.priority_label==="CRITICAL").length;
+  const h=results.filter(r=>r.priority_label==="HIGH").length;
+  const au=results.filter(r=>r.routing==="auto_resolve").length;
+  const urg=results.filter(r=>r.routing==="urgent_escalation").length;
+  const el=document.getElementById("batch-stats");
+  el.innerHTML=[{l:"Critical",v:c,bg:"#FEE2E2",tc:"#991B1B"},{l:"High",v:h,bg:"#FEF3C7",tc:"#92400E"},{l:"Auto-Resolve",v:au,bg:"#D1FAE5",tc:"#065F46"},{l:"Urgent Esc.",v:urg,bg:"#FCA5A5",tc:"#991B1B"}].map(s=>`<div class="stat-c" style="background:${s.bg};"><div class="stat-n" style="color:${s.tc};">${s.v}</div><div class="stat-l" style="color:${s.tc};">${s.l}</div></div>`).join("");
+  el.classList.remove("hidden");
+}
+
+function renderFilters(results){
+  const fr=document.getElementById("filter-row");
+  fr.innerHTML=["all","CRITICAL","HIGH","MEDIUM","LOW"].map(f=>`<button class="filter-btn${f==="all"?" on":""}" onclick="applyFilter('${f}')">${f==="all"?"All ("+results.length+")":f+" ("+results.filter(r=>r.priority_label===f).length+")"}</button>`).join("");
+  fr.style.display="flex";
+  fr._results=results;
+}
+
+function applyFilter(f){
+  const fr=document.getElementById("filter-row");
+  fr.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("on",b.textContent.startsWith(f==="all"?"All":f)));
+  const results=fr._results;
+  const filtered=f==="all"?results:results.filter(r=>r.priority_label===f);
+  renderTable(filtered);
+}
+
+function renderTable(filtered){
+  const el=document.getElementById("batch-results");
+  el.classList.remove("hidden");
+  el.innerHTML=`<div style="overflow-x:auto;"><table>
+<thead><tr><th>Request</th><th>Merchant</th><th style="text-align:center;">Score</th><th>Priority</th><th>Routing</th><th>Flags</th><th>Recommended Action</th></tr></thead>
+<tbody>${filtered.map(r=>{
+  const pm=PRI[r.priority_label]||PRI.MEDIUM;
+  const flags=(r.flags||[]).slice(0,2).map(f=>`<span class="tag">${f.replace(/_/g," ")}</span>`).join(" ")+(r.flags&&r.flags.length>2?` <span class="tag">+${r.flags.length-2}</span>`:"");
+  return`<tr>
+<td><div style="font-size:12px;font-weight:500;">${esc(r.request_id)}</div><div style="font-size:11px;color:#6B7280;margin-top:1px;">${(r.request_type||"").replace(/_/g," ")}</div></td>
+<td><div style="font-size:12px;font-weight:500;">${esc(r.merchant_name||r.merchant_id)}</div><div style="margin-top:2px;">${tierBadge(r.merchant_tier)}</div></td>
+<td style="text-align:center;"><div class="sm-ring" style="background:${pm.ring};color:${pm.tc};">${Math.round(r.priority_score||0)}</div></td>
+<td>${priBadge(r.priority_label)}</td>
+<td>${routBadge(r.routing)}</td>
+<td style="white-space:nowrap;">${flags}</td>
+<td style="font-size:12px;color:#4B5563;max-width:180px;line-height:1.4;">${esc((r.recommended_action||"").substring(0,80))}${(r.recommended_action||"").length>80?"…":""}</td>
+</tr>`;}).join("")}</tbody></table></div>`;
+}
+
+async function runBatch(){
+  const btn=document.getElementById("btn-batch");
+  btn.disabled=true;btn.innerHTML='<span class="spin" style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;"></span> Processing…';
+  document.getElementById("batch-preview").classList.add("hidden");
+  document.getElementById("batch-prog").classList.remove("hidden");
+  document.getElementById("batch-results").classList.add("hidden");
+  try{
+    const results=await batchAnalysis(setProg);
+    results.sort((a,b)=>(b.priority_score||0)-(a.priority_score||0));
+    document.getElementById("batch-prog").classList.add("hidden");
+    renderBatchStats(results);
+    renderFilters(results);
+    renderTable(results);
+  }catch(e){
+    document.getElementById("batch-prog").classList.add("hidden");
+    document.getElementById("batch-results").classList.remove("hidden");
+    document.getElementById("batch-results").innerHTML=`<div class="err-box">Error: ${esc(e.message)}</div>`;
+  }finally{
+    btn.disabled=false;btn.innerHTML="⚡ Process Batch Queue";
+  }
+}
+
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach((b,i)=>b.classList.toggle("on",i===(t==="single"?0:1)));
+  document.getElementById("pane-single").classList.toggle("hidden",t!=="single");
+  document.getElementById("pane-batch").classList.toggle("hidden",t==="single");
+}
+
+function initPreview(){
+  document.getElementById("preview-body").innerHTML=QUEUE.slice(0,8).map(r=>`<tr>
+<td style="font-size:11px;color:#6B7280;">${r.request_id}</td>
+<td style="font-size:12px;font-weight:500;">${esc(r.merchant_name)}</td>
+<td>${tierBadge(r.merchant_tier)}</td>
+<td style="font-size:12px;">${r.request_type.replace(/_/g," ")}</td>
+<td style="font-size:12px;">$${(r.monthly_gmv_usd/1000).toFixed(0)}K</td>
+<td><span class="tag">${r.resolution}</span></td>
+</tr>`).join("");
+}
+
+initPresets();
+initPreview();
+</script>
+</body>
+</html>
