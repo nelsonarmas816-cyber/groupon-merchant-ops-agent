@@ -57,4 +57,4 @@ Manager Escalation · Urgent Escalation
 - **Option:** B — Merchant Ops AI Transformation
 - **Dataset:** merchant_requests.csv (8,000 rows) + 
   merchant_profiles.csv (1,200 rows)
-- **Candidate:** Sebastian
+- **Candidate:** Nelson Armas
