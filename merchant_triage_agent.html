@@ -199,6 +199,7 @@ const PRESETS=[
 ];
 
 // ─── AGENT CORE ────────────────────────────────────────────────────────────────
+const API_KEY="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";
 const SYSTEM=`You are an intelligent Merchant Operations Triage Agent for Groupon Global Operations (Madrid hub).
 
 MANDATORY STEPS — execute in this exact order:
@@ -242,7 +243,7 @@ function execTool(name,input){
 async function agentLoop(mid,type,desc,onStep){
   const msgs=[{role:"user",content:`Triage this merchant request:\n\nMerchant ID: ${mid}\nRequest Type: ${type}\nDescription: ${desc}\n\nUse your tools to gather context, then return your JSON triage decision.`}];
   for(let i=0;i<8;i++){
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1500,system:SYSTEM,tools:TOOLS,messages:msgs})});
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1500,system:SYSTEM,tools:TOOLS,messages:msgs})});
     if(!r.ok){const t=await r.text();throw new Error("API "+r.status+": "+t.substring(0,200));}
     const d=await r.json();
     msgs.push({role:"assistant",content:d.content});
@@ -273,7 +274,7 @@ async function batchAnalysis(onProg){
   onProg(40);
   const prompt=`You are a Merchant Ops Triage Agent for Groupon. Prioritize these ${QUEUE.length} pending/escalated requests.\n\nPRIORITY RULES:\n- Platinum + any issue = minimum HIGH\n- Legal threats (keywords: legal, lawsuit, lawyer) = CRITICAL\n- churn_risk > 0.6 = escalate one level\n- GMV > $100K/mo = escalate one level\n- Simple content changes with touches <= 2 = LOW, route to auto_resolve\n- Repeat escalations (touches > 5) = HIGH minimum\n\nROUTING: auto_resolve | bpo_standard | in_house_specialist | manager_escalation | urgent_escalation\n\nDATA:\n${JSON.stringify(ctx)}\n\nRespond ONLY with valid JSON array (absolutely no markdown):\n[{"request_id":"...","merchant_id":"...","merchant_name":"...","merchant_tier":"...","request_type":"...","priority_score":0-100,"priority_label":"CRITICAL|HIGH|MEDIUM|LOW","routing":"...","flags":["..."],"reasoning":"1-2 sentences","recommended_action":"single most important next step"}]`;
   onProg(60);
-  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4000,messages:[{role:"user",content:prompt}]})});
+  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4000,messages:[{role:"user",content:prompt}]})});
   if(!r.ok){const t=await r.text();throw new Error("API "+r.status+": "+t.substring(0,200));}
   onProg(85);
   const d=await r.json();
